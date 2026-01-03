@@ -5,27 +5,40 @@ import axios from "axios";
 function Home() {
   const [courts, setCourts] = useState([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
 
+  /* ---------- FETCH COURTS ---------- */
   useEffect(() => {
-    axios.get("http://localhost:5000/courts").then((res) => {
-      setCourts(res.data);
-    });
+    axios
+      .get("https://sports-backend-8t4w.onrender.com/courts")
+      .then((res) => {
+        setCourts(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("API ERROR:", err);
+        setLoading(false);
+      });
   }, []);
 
-  // 🔍 FILTER LOGIC
+  /* ---------- FILTER LOGIC (SAFE) ---------- */
   const filteredCourts = courts.filter((court) => {
+    if (!search || search.trim() === "") return true;
+
     const q = search.toLowerCase();
+
     return (
       court.name.toLowerCase().includes(q) ||
       court.location.toLowerCase().includes(q) ||
-      court.sport?.toLowerCase().includes(q)
+      (court.sport && court.sport.toLowerCase().includes(q))
     );
   });
 
   return (
     <div>
-      {/* HERO */}
+      {/* ---------- HERO ---------- */}
       <div
         className="h-96 bg-cover bg-center text-white flex flex-col items-center justify-center gap-4"
         style={{
@@ -45,14 +58,19 @@ function Home() {
         />
       </div>
 
-      {/* COURTS */}
+      {/* ---------- COURTS ---------- */}
       <div className="max-w-6xl mx-auto p-6">
         <h2 className="text-xl font-bold mb-4">Available Venues</h2>
 
-        {filteredCourts.length === 0 && (
+        {/* LOADING STATE */}
+        {loading && <p className="text-gray-500">Loading venues...</p>}
+
+        {/* EMPTY STATE */}
+        {!loading && filteredCourts.length === 0 && (
           <p className="text-gray-500">No venues found</p>
         )}
 
+        {/* COURT CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {filteredCourts.map((court) => (
             <div key={court.id} className="bg-white shadow rounded">
@@ -63,11 +81,13 @@ function Home() {
               />
 
               <div className="p-4">
-                <span className="text-xs uppercase text-green-600 font-semibold">
-                  {court.sport}
-                </span>
+                {court.sport && (
+                  <span className="text-xs uppercase text-green-600 font-semibold">
+                    {court.sport}
+                  </span>
+                )}
 
-                <h3 className="font-bold">{court.name}</h3>
+                <h3 className="font-bold mt-1">{court.name}</h3>
                 <p className="text-sm text-gray-600">{court.location}</p>
 
                 <button
