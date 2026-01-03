@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
 import Navbar from "./components/Navbar";
@@ -9,8 +9,8 @@ import CourtDetails from "./pages/CourtDetails";
 
 export default function App() {
   return (
-    <BrowserRouter>
-      {/* GLOBAL TOAST NOTIFICATIONS */}
+    <>
+      {/* GLOBAL TOASTS */}
       <Toaster position="bottom-right" />
 
       {/* NAVBAR */}
@@ -23,6 +23,6 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
       </Routes>
-    </BrowserRouter>
+    </>
   );
 }
